@@ -1,0 +1,113 @@
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+
+class Game:
+
+    GOAL = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, None]]
+    
+    def __init__(self, initial_board):
+        self.board = initial_board
+
+    def show(self):
+        _, ax = plt.subplots()
+        plt.imshow(np.array([[0 if x is None else x for x in fila] for fila in self.board]), cmap="YlGn", interpolation="nearest",vmin=0, vmax=255)
+        ax.set_xticks(np.arange(-0.5, 4, 1), minor=True)
+        ax.set_yticks(np.arange(-0.5, 4, 1), minor=True)
+        ax.grid(which="minor", color="black", linestyle="-", linewidth=2)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        for i in range(4):
+            for j in range(4):
+                value = self.board[i][j]
+                text = str(value) if value is not None else " "
+                ax.text(j, i, text, ha='center', va='center', color='black', fontsize=16, fontweight='bold')
+        plt.show()
+
+    def is_game_win(self):
+        return self.board == self.GOAL
+    
+    def find_empty(self):
+        for i in range(4):
+            for j in range(4):
+                if self.board[i][j] is None:
+                    return i, j
+    
+    def is_allowed_move_up(self):
+        empty_row, _ = self.find_empty()
+        return empty_row > 0
+    
+    def is_allowed_move_down(self):
+        empty_row, _ = self.find_empty()
+        return empty_row < 3
+    
+    def is_allowed_move_left(self):
+        _, empty_col = self.find_empty()
+        return empty_col > 0
+    
+    def is_allowed_move_right(self):
+        _, empty_col = self.find_empty()
+        return empty_col < 3
+    
+    def move_up(self):
+        if self.is_allowed_move_up():
+            empty_row, empty_col = self.find_empty()
+            self.board[empty_row][empty_col], self.board[empty_row - 1][empty_col] = self.board[empty_row - 1][empty_col], None
+    
+    def move_down(self):
+        if self.is_allowed_move_down():
+            empty_row, empty_col = self.find_empty()
+            self.board[empty_row][empty_col], self.board[empty_row + 1][empty_col] = self.board[empty_row + 1][empty_col], None
+    
+    def move_left(self):
+        if self.is_allowed_move_left():
+            empty_row, empty_col = self.find_empty()
+            self.board[empty_row][empty_col], self.board[empty_row][empty_col - 1] = self.board[empty_row][empty_col - 1], None
+    
+    def move_right(self):
+        if self.is_allowed_move_right():
+            empty_row, empty_col = self.find_empty()
+            self.board[empty_row][empty_col], self.board[empty_row][empty_col + 1] = self.board[empty_row][empty_col + 1], None
+    
+    def next_allowed_moves(self):
+        moves = []
+        if self.is_allowed_move_up():
+            new_board = [row[:] for row in self.board]
+            game_copy = Game(new_board)
+            game_copy.move_up()
+            moves.append(game_copy.board)
+        if self.is_allowed_move_down():
+            new_board = [row[:] for row in self.board]
+            game_copy = Game(new_board)
+            game_copy.move_down()
+            moves.append(game_copy.board)
+        if self.is_allowed_move_left():
+            new_board = [row[:] for row in self.board]
+            game_copy = Game(new_board)
+            game_copy.move_left()
+            moves.append(game_copy.board)
+        if self.is_allowed_move_right():
+            new_board = [row[:] for row in self.board]
+            game_copy = Game(new_board)
+            game_copy.move_right()
+            moves.append(game_copy.board)
+        return moves
+
+
+initial_board = [
+    [8, 13, 9, 15], 
+    [None, 14, 6, 1], 
+    [11, 2, 5, 4], 
+    [3, 7, 10, 12]
+]
+game = Game( initial_board )
+game.show()
+
+
+#los movimientos se dan asi.
+
+game.move_right() 
+game.show()
+
+
+
